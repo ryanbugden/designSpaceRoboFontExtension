@@ -142,16 +142,19 @@ def symbolImage(symbolName, color, flipped=False, pointSize=18.0, weight="light"
     image = None
     if osVersionCurrent >= osVersion12_0:
         image = AppKit.NSImage.imageWithSystemSymbolName_accessibilityDescription_(symbolName, "")
-        if image:
+        # not all SF symbols are available on older systems
+        if image is not None:
             if isinstance(color, tuple):
                 color = AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(*color)
             else:
                 color = symbolColorMap[color]()
 
+            pointSize = float(pointSize)
+
             scales = {
-                "small":  AppKit.NSImageSymbolScaleSmall,
+                "small": AppKit.NSImageSymbolScaleSmall,
                 "medium": AppKit.NSImageSymbolScaleMedium,
-                "large":  AppKit.NSImageSymbolScaleLarge,
+                "large": AppKit.NSImageSymbolScaleLarge,
             }
             scale = scales.get(scale, AppKit.NSImageSymbolScaleMedium)
 
@@ -167,17 +170,18 @@ def symbolImage(symbolName, color, flipped=False, pointSize=18.0, weight="light"
                 "black":      AppKit.NSFontWeightBlack,
             }
             weight = weights.get(weight, AppKit.NSFontWeightRegular)
-                        
+
             baseConfig = AppKit.NSImageSymbolConfiguration.configurationWithHierarchicalColor_(color)
             newConfig = AppKit.NSImageSymbolConfiguration.configurationWithPointSize_weight_scale_(
-                float(pointSize),
+                pointSize,
                 weight,
                 scale
             )
+            # newConfig = AppKit.NSImageSymbolConfiguration.configurationWithScale_(scale)
             configuration = baseConfig.configurationByApplyingConfiguration_(newConfig)
             image = image.imageWithSymbolConfiguration_(configuration)
-    if not image:
-        # older systems, or missing SF symbol
+    if image is None:
+        # older systems
         bundle = ExtensionBundle("DesignspaceEditor2")
         image = bundle.getResourceImage(f"toolbar_30_30_{symbolName}")
     if flipped and image:
