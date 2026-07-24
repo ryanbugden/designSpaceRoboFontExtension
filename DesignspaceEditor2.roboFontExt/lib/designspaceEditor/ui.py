@@ -364,11 +364,12 @@ class GenerateInstanceSheet:
                 if not os.path.exists(os.path.dirname(instanceDescriptor.path)):
                     os.makedirs(os.path.dirname(instanceDescriptor.path))
                 fontPath = instanceDescriptor.path
+                fileName, ext = os.path.splitext(fontPath)
                 if addMathModelSuffix:
-                    fileName, ext = os.path.splitext(fontPath)
                     fontPath = f"{fileName}-{('mm', 'varLib')[mathModel]}{ext}"
 
-                font.save(path=fontPath)
+                struct = "zip" if ext == ".ufoz" else None
+                font.save(path=fontPath, structure=struct)
             except Exception as e:
                 print(f"Failed to generate instance: {e}")
 
@@ -1305,8 +1306,8 @@ class DesignspaceEditorController(Subscriber, WindowController, BaseNotification
         except ImportError:
             return False
 
-
     # MENU
+
     def glyphEditorWantsContextualMenuItems(self, info):
         # Build a glypheditor contextual menu for DSE
         # with all locations in this designspace
@@ -1315,24 +1316,25 @@ class DesignspaceEditorController(Subscriber, WindowController, BaseNotification
 
         locationMenuItems = []
         self.menuItemTextToLocationTable = {}
-        designspaceFileName = os.path.basename(self.operator.path)
-        for s in self.operator.sources:
-            locationText = f"Source {os.path.basename(s.path)}"
-            self.menuItemTextToLocationTable[locationText] = s.getFullDesignLocation(self.operator)
+        if self.operator.path:
+            designspaceFileName = os.path.basename(self.operator.path)
+        else:
+            designspaceFileName = "Designspace"
+        for source in self.operator.sources:
+            locationText = f"Source {os.path.basename(source.path)}"
+            self.menuItemTextToLocationTable[locationText] = source.getFullDesignLocation(self.operator)
             locationMenuItems.append((locationText, self.changePreviewLocationMenuCallback))
         locationMenuItems.append("----")
-        for s in self.operator.instances:
-            if s.familyName and s.styleName:
-                locationText = f"Instance {s.familyName} {s.styleName}"
+        for instance in self.operator.instances:
+            if instance.familyName and instance.styleName:
+                locationText = f"Instance {instance.familyName} {instance.styleName}"
             else:
-                locationText = f"Instance {self.operator.locationToDescriptiveString(s.location)}"
-            self.menuItemTextToLocationTable[locationText] = s.getFullDesignLocation(self.operator)
+                locationText = f"Instance {self.operator.locationToDescriptiveString(instance.location)}"
+            self.menuItemTextToLocationTable[locationText] = instance.getFullDesignLocation(self.operator)
             locationMenuItems.append((locationText, self.changePreviewLocationMenuCallback))
         # could add axis min / default / max as well
         myMenuItems = [
-            (f"{designspaceFileName} Locations",
-                locationMenuItems,
-            )
+            (f"{designspaceFileName} Locations", locationMenuItems)
         ]
         info["itemDescriptions"].extend(myMenuItems)
 
@@ -1490,6 +1492,12 @@ class DesignspaceEditorController(Subscriber, WindowController, BaseNotification
             filename = os.path.relpath(font.path, os.path.dirname(self.operator.path))
         else:
             filename = font.path
+
+        # get location information for width and weight from the OS2 info
+        if "width" in defaultLocation and font.info.openTypeOS2WidthClass is not None:
+            defaultLocation["width"] = font.info.openTypeOS2WidthClass * 100
+        if "weight" in defaultLocation and font.info.openTypeOS2WeightClass is not None:
+            defaultLocation["weight"] = font.info.openTypeOS2WeightClass
 
         sourceDescriptor = self.operator.addSourceDescriptor(
             path=font.path,
@@ -2285,12 +2293,7 @@ class DesignspaceEditorController(Subscriber, WindowController, BaseNotification
 
     @notificationConductor
     def designspaceEditorSourcesDidChange(self, notification):
-        if len(self.operator.sources) == len(self.sources.list):
-            for item, sourceDescriptor in zip(self.sources.list, self.operator.sources):
-                item.update(self.wrapSourceDescriptor(sourceDescriptor))
-        else:
-            self.sources.list.set([self.wrapSourceDescriptor(sourceDescriptor) for sourceDescriptor in self.operator.instances])
-
+        self.sources.list.set([self.wrapSourceDescriptor(sourceDescriptor) for sourceDescriptor in self.operator.sources])
         self.updateColumnHeadersFromAxes()
 
     # instances notifications
@@ -2314,11 +2317,7 @@ class DesignspaceEditorController(Subscriber, WindowController, BaseNotification
 
     @notificationConductor
     def designspaceEditorInstancesDidChange(self, notification):
-        if len(self.operator.instances) == len(self.instances.list):
-            for item, instanceDescriptor in zip(self.instances.list, self.operator.instances):
-                item.update(self.wrapInstanceDescriptor(instanceDescriptor))
-        else:
-            self.instances.list.set([self.wrapInstanceDescriptor(instanceDescriptor) for instanceDescriptor in self.operator.instances])
+        self.instances.list.set([self.wrapInstanceDescriptor(instanceDescriptor) for instanceDescriptor in self.operator.instances])
 
     @notificationConductor
     def designspaceEditorRulesDidChange(self, notification):
@@ -2340,5 +2339,5 @@ if __name__ == '__main__':
     #path = "/Users/frederik/Documents/dev/letterror/mutatorSans/MutatorSans.designspace"
     # path = "/Users/frederik/Documents/fontsGit/RoboType/RF.designspace"
     path = "/Users/erik/code/mutatorSans/MutatorSans.designspace"
-    #path = None
+    path = None
     DesignspaceEditorController(path)
