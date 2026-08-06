@@ -4,15 +4,13 @@ from lib.cells.doubleClickCell import RFDoubleClickCell
 from mojo.extensions import ExtensionBundle
 
 
-designspaceBundle = ExtensionBundle("DesignspaceEditor2")
+BUNDLE = ExtensionBundle("DesignspaceEditor2")
 
 numberFormatter = AppKit.NSNumberFormatter.alloc().init()
 numberFormatter.setNumberStyle_(AppKit.NSNumberFormatterDecimalStyle)
 numberFormatter.setAllowsFloats_(True)
 numberFormatter.setLocalizesFormat_(False)
 numberFormatter.setUsesGroupingSeparator_(False)
-
-infoImage = AppKit.NSImage.imageWithSystemSymbolName_accessibilityDescription_("info.circle.fill", None)
 
 
 def makeTableImage(symbolName):
@@ -120,7 +118,7 @@ class Controller(ezui.WindowController):
         marginDescriptions = dict(margins=(10, 0, 10, 10))
         descriptionData = dict(
             axesTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_axes")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_axes")
             ),
             axesStack=marginDescriptions,
             axesTable=dict(
@@ -143,7 +141,7 @@ class Controller(ezui.WindowController):
             ),
 
             sourcesTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_sources")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_sources")
             ),
             sourcesStack=marginDescriptions,
             sourcesTable=dict(
@@ -172,7 +170,7 @@ class Controller(ezui.WindowController):
             ),
 
             instancesTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_instances")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_instances")
             ),
             instancesStack=marginDescriptions,
             instancesTable=dict(
@@ -213,7 +211,7 @@ class Controller(ezui.WindowController):
             ),
 
             rulesTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_rules")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_rules")
             ),
             rulesEditor=dict(
                 width="fill",
@@ -222,7 +220,7 @@ class Controller(ezui.WindowController):
             ),
 
             labelsTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_location_labels")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_location_labels")
             ),
             labelsStack=marginDescriptions,
             labelsEditor=dict(
@@ -237,7 +235,7 @@ class Controller(ezui.WindowController):
             ),
 
             vfsTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_variable_fonts")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_variable_fonts")
             ),
             vfsStack=marginDescriptions,
             vfsEditor=dict(
@@ -252,7 +250,7 @@ class Controller(ezui.WindowController):
             ),
 
             problemsTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_problems")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_problems")
             ),
             problemsStack=marginDescriptions,
             problemsTable=dict(
@@ -268,7 +266,7 @@ class Controller(ezui.WindowController):
             ),
 
             notesTab=dict(
-                image=designspaceBundle.getResourceImage("toolbar_30_30_icon_notes")
+                image=BUNDLE.getResourceImage("toolbar_30_30_icon_notes")
             ),
             notesEditor=dict(
                 width="fill",
