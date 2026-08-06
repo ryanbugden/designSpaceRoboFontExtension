@@ -1,9 +1,7 @@
 import AppKit
 import ezui
-
 from lib.cells.doubleClickCell import RFDoubleClickCell
-
-from mojo.extensions import getExtensionDefault, ExtensionBundle
+from mojo.extensions import ExtensionBundle
 
 
 designspaceBundle = ExtensionBundle("DesignspaceEditor2")
@@ -17,86 +15,27 @@ numberFormatter.setUsesGroupingSeparator_(False)
 infoImage = AppKit.NSImage.imageWithSystemSymbolName_accessibilityDescription_("info.circle.fill", None)
 
 
-INFO_IMAGE_COLUMN = ezui.makeImage(
-    symbolName="info.circle",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
+def makeTableImage(symbolName):
+    ezui.makeImage(
+        symbolName="info.circle",
+        template=True,
+        symbolConfiguration=dict(
+            weight="regular",
+            scale="small",
+        )
     )
-)
-INFO_IMAGE_CELL = ezui.makeImage(
-    symbolName="info.circle.fill",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-AXIS_REGISTERED_SYMBOL = ezui.makeImage(  # 􀀦
-    symbolName="r.circle",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-AXIS_HAS_MAP_SYMBOL = ezui.makeImage(  # 􀙊
-    symbolName="map",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-AXIS_HAS_LABELS_SYMBOL = ezui.makeImage(  # 􀋡
-    symbolName="tag",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-SOURCE_HAS_PATH_SYMBOL = ezui.makeImage(  # 􀤄
-    symbolName="opticaldiscdrive",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-SOURCE_IS_DEFAULT_SYMBOL = ezui.makeImage(  # 􀎪
-    symbolName="mappin.and.ellipse",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-SOURCE_HAS_LOCALISED_FAMILY_NAMES_SYMBOL = ezui.makeImage(  # 􀆪
-    symbolName="globe",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-SOURCE_HAS_MUTED_GLYPHS_SYMBOL = ezui.makeImage(  # 􀋝
-    symbolName="speaker.slash",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
-CHECKMARK = ezui.makeImage( 
-    symbolName="checkmark",
-    template=True,
-    symbolConfiguration=dict(
-        weight="regular",
-        scale="small",
-    )
-)
+
+
+INFO_IMAGE_COLUMN = makeTableImage("info.circle")
+INFO_IMAGE_CELL = makeTableImage("info.circle.fill")
+AXIS_REGISTERED_SYMBOL = makeTableImage("r.circle")  # 􀀦
+AXIS_HAS_MAP_SYMBOL = makeTableImage("map")  # 􀙊
+AXIS_HAS_LABELS_SYMBOL = makeTableImage("tag")  # 􀋡
+SOURCE_HAS_PATH_SYMBOL = makeTableImage("opticaldiscdrive")  # 􀤄
+SOURCE_IS_DEFAULT_SYMBOL = makeTableImage("mappin.and.ellipse")  # 􀎪
+SOURCE_HAS_LOCALISED_FAMILY_NAMES_SYMBOL = makeTableImage("globe")  # 􀆪
+SOURCE_HAS_MUTED_GLYPHS_SYMBOL = makeTableImage("speaker.slash")  # 􀋝
+CHECKMARK = makeTableImage("checkmark")
 # EMPTY_IMAGE = ezui.makeImage( 
 #     symbolName="checkmark",
 #     template=True,
@@ -122,8 +61,10 @@ def doubleClickCell(callback, image=None):
     cell.setImage_(image)
     return cell
 
+
 def checkmarkValueConverter(bool):
     return "✓" if bool else ""
+
 
 # def discreteValueConverter(value):
 #     if value is None:
@@ -131,13 +72,11 @@ def checkmarkValueConverter(bool):
 #     return value
 
 
-
 class Controller(ezui.WindowController):
-
     def build(self):
         content = """
         = ToolbarTabs
-        
+
         * ToolbarTab: Axes                  @axesTab
         > |---|                             @axesTable
         > * HorizontalStack                 @axesStack
@@ -202,7 +141,7 @@ class Controller(ezui.WindowController):
                     dict(title="🏷️", identifier="axisHasLabels", width=20, cellDescription=dict(valueToCellConverter=checkmarkValueConverter), allowsSorting=False, editable=False, sortable=True),
                 ]
             ),
-            
+
             sourcesTab=dict(
                 image=designspaceBundle.getResourceImage("toolbar_30_30_icon_sources")
             ),
@@ -294,7 +233,7 @@ class Controller(ezui.WindowController):
             labelsActions=dict(
                 itemDescriptions=[
                     dict(identifier="basicItem", text="Preview Labels"),
-               ]
+                ]
             ),
 
             vfsTab=dict(
@@ -309,7 +248,7 @@ class Controller(ezui.WindowController):
             vfsActions=dict(
                 itemDescriptions=[
                     dict(identifier="basicItem", text="Preview Variable Fonts"),
-               ]
+                ]
             ),
 
             problemsTab=dict(
@@ -320,7 +259,7 @@ class Controller(ezui.WindowController):
                 width="fill",
                 height="fill",
                 allowsSorting=True,
-                columnDescriptions = [
+                columnDescriptions=[
                     dict(title="", identifier="problemIcon", width=20, sortable=True),
                     dict(title="Where", identifier="problemClass", width=130, sortable=True),
                     dict(title="What", identifier="problemDescription", minWidth=200, width=200, maxWidth=1000, sortable=True),
@@ -350,37 +289,69 @@ class Controller(ezui.WindowController):
         self.w.addToolbarItem(dict(
             itemIdentifier="preview",
             label="Preview",
-            imageObject=ezui.makeImage(symbolName="text.alignleft", symbolConfiguration=dict(renderingMode="hierarchical", weight="regular", scale="small", colors=[(1, 0, 1, 1), ])),
+            imageObject=ezui.makeImage(
+                symbolName="text.alignleft",
+                symbolConfiguration=dict(
+                    renderingMode="hierarchical",
+                    weight="regular",
+                    scale="small",
+                    colors=[(1, 0, 1, 1), ]
+                )
+            ),
             callback=self.toolbarPreviewCallback
         ))
         self.w.addToolbarItem(dict(itemIdentifier=AppKit.NSToolbarSpaceItemIdentifier))
         self.w.addToolbarItem(dict(
             itemIdentifier="openIn",
             label="Open In...",
-            imageObject=ezui.makeImage(symbolName="square.and.arrow.up", template=True, symbolConfiguration=dict(renderingMode="hierarchical", weight="regular", scale="small")),
+            imageObject=ezui.makeImage(
+                symbolName="square.and.arrow.up",
+                template=True,
+                symbolConfiguration=dict(
+                    renderingMode="hierarchical",
+                    weight="regular",
+                    scale="small"
+                )
+            ),
             callback=self.toolbarSaveCallback
         ))
         self.w.addToolbarItem(dict(
             itemIdentifier="save",
             label="Save",
-            imageObject=ezui.makeImage(symbolName="square.and.arrow.down", template=True, symbolConfiguration=dict(renderingMode="hierarchical", weight="regular", scale="small")),
+            imageObject=ezui.makeImage(
+                symbolName="square.and.arrow.down",
+                template=True,
+                symbolConfiguration=dict(
+                    renderingMode="hierarchical",
+                    weight="regular",
+                    scale="small"
+                )
+            ),
             callback=self.toolbarSaveCallback
         ))
         self.w.addToolbarItem(dict(
             itemIdentifier="help",
             label="Help",
-            imageObject=ezui.makeImage(symbolName="questionmark.circle", template=True, symbolConfiguration=dict(renderingMode="hierarchical", weight="regular", scale="small")),
+            imageObject=ezui.makeImage(
+                symbolName="questionmark.circle",
+                template=True,
+                symbolConfiguration=dict(
+                    renderingMode="hierarchical",
+                    weight="regular",
+                    scale="small"
+                )
+            ),
             callback=self.toolbarHelpCallback
         ))
         symbols = {
-            "genericInfoButton" : INFO_IMAGE_COLUMN, 
-            "axisIsRegistered" : AXIS_REGISTERED_SYMBOL,
-            "axisHasMap" : AXIS_HAS_MAP_SYMBOL,
-            "axisHasLabels" : AXIS_HAS_LABELS_SYMBOL,
-            "sourceHasPath" : SOURCE_HAS_PATH_SYMBOL,
-            "sourceIsDefault" : SOURCE_IS_DEFAULT_SYMBOL,
-            "sourceHasLocalisedFamilyNames" : SOURCE_HAS_LOCALISED_FAMILY_NAMES_SYMBOL,
-            "sourceHasMutedGlyphs" : SOURCE_HAS_MUTED_GLYPHS_SYMBOL,
+            "genericInfoButton": INFO_IMAGE_COLUMN,
+            "axisIsRegistered": AXIS_REGISTERED_SYMBOL,
+            "axisHasMap": AXIS_HAS_MAP_SYMBOL,
+            "axisHasLabels": AXIS_HAS_LABELS_SYMBOL,
+            "sourceHasPath": SOURCE_HAS_PATH_SYMBOL,
+            "sourceIsDefault": SOURCE_IS_DEFAULT_SYMBOL,
+            "sourceHasLocalisedFamilyNames": SOURCE_HAS_LOCALISED_FAMILY_NAMES_SYMBOL,
+            "sourceHasMutedGlyphs": SOURCE_HAS_MUTED_GLYPHS_SYMBOL,
         }
         for table in ["axesTable", "sourcesTable"]:
             nsTableView = self.w.getItem(table)._table.getNSTableView()
@@ -396,7 +367,7 @@ class Controller(ezui.WindowController):
     def started(self):
         self.w.open()
 
-    # axis
+    # Axes
 
     def axisListDoubleClickCallback(self, sender):
         print("axisListDoubleClickCallback")
@@ -409,7 +380,7 @@ class Controller(ezui.WindowController):
 
     # def axisAddOpticalAxisCallback(self, sender):
     #     print("axisAddOpticalAxisCallback")
-        
+
     def axesTableMenuCallback(self, sender):
         print("axesTableMenuCallback")
 
@@ -420,20 +391,20 @@ class Controller(ezui.WindowController):
     def axesAddRemoveButtonRemoveCallback(self, sender):
         print("remove")
 
-    # sources
+    # Sources
 
     def sourceListDoubleClickCallback(self, sender):
         print("sourceListDoubleClickCallback")
-        
+
     def sourcesTableMenuCallback(self, sender):
         print("sourcesTableMenuCallback")
 
-    # instances
+    # Instances
 
     def instancesTableMenuCallback(self, sender):
         print("instancesTableMenuCallback")
 
-    # toolbar
+    # Toolbar
 
     def toolbarPrepolatorCallback(self, sender):
         print("prepolator")
@@ -451,10 +422,7 @@ class Controller(ezui.WindowController):
         print("help")
 
 
-
-
 class AddAxisSheetController(ezui.WindowController):
-
     def build(self, parent):
         content = """
         !!!!! Add Axis            @addAxisTitle
@@ -514,7 +482,7 @@ class AddAxisSheetController(ezui.WindowController):
         )
         self.w = ezui.EZSheet(
             content=content,
-            size=(200,"auto"),
+            size=(200, "auto"),
             descriptionData=descriptionData,
             parent=parent,
             controller=self
@@ -533,11 +501,11 @@ class AddAxisSheetController(ezui.WindowController):
     def makeAxisItem(self, axisName, axisTag=None, axisMinimum=None, axisDefault=None, axisMaximum=None, axisDiscreteValues=None):
         axisIsRegistered = False
         if axisName in REGISTERED_AXES:
-            axisIsRegistered=True
+            axisIsRegistered = True
             axisTag, axisMinimum, axisDefault, axisMaximum, axisDiscreteValues, axisLabel = REGISTERED_AXES[axisName]
-            axisIsHidden=False
-            axisHasMap=False
-            axisHasLabels=True if axisLabel else False
+            axisIsHidden = False
+            axisHasMap = False
+            axisHasLabels = True if axisLabel else False
         return dict(
             genericInfoButton=INFO_IMAGE_CELL,
             axisIsRegistered=axisIsRegistered,
@@ -556,18 +524,22 @@ class AddAxisSheetController(ezui.WindowController):
         items = [self.makeAxisItem(axisName="Weight")]
         self.parent.getItem("axesTable").appendItems(items)
         self.w.close()
+
     def addWidthAxisButtonCallback(self, sender):
         items = [self.makeAxisItem(axisName="Width")]
         self.parent.getItem("axesTable").appendItems(items)
         self.w.close()
+
     def addOpticalAxisButtonCallback(self, sender):
         items = [self.makeAxisItem(axisName="Optical Size")]
         self.parent.getItem("axesTable").appendItems(items)
         self.w.close()
+
     def addSlantAxisButtonCallback(self, sender):
         items = [self.makeAxisItem(axisName="Slant")]
         self.parent.getItem("axesTable").appendItems(items)
         self.w.close()
+
     def addItalicAxisButtonCallback(self, sender):
         items = [self.makeAxisItem(axisName="Italic")]
         self.parent.getItem("axesTable").appendItems(items)
