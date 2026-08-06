@@ -16,8 +16,8 @@ infoImage = AppKit.NSImage.imageWithSystemSymbolName_accessibilityDescription_("
 
 
 def makeTableImage(symbolName):
-    ezui.makeImage(
-        symbolName="info.circle",
+    return ezui.makeImage(
+        symbolName=symbolName,
         template=True,
         symbolConfiguration=dict(
             weight="regular",
