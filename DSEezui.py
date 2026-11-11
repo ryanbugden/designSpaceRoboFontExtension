@@ -20,7 +20,6 @@ def makeTableImage(symbolName):
         symbolConfiguration=dict(
             weight="regular",
             scale="small",
-        )
         ),
     )
 
